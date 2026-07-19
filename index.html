@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Moon Alien Shooter</title>
+<style>
+body {
+  margin:0;
+  background:black;
+  overflow:hidden;
+}
+canvas {
+  display:block;
+  margin:auto;
+  background:linear-gradient(#050505,#222);
+}
+</style>
+</head>
+
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+let player={x:180,y:540,w:40,h:40};
+let bullets=[];
+let aliens=[];
+let score=0;
+
+document.addEventListener("touchstart",shoot);
+document.addEventListener("click",shoot);
+
+function shoot(){
+ bullets.push({x:player.x+18,y:player.y});
+}
+
+function createAlien(){
+ aliens.push({
+  x:Math.random()*360,
+  y:0,
+  size:35
+ });
+}
+setInterval(createAlien,800);
+
+function update(){
+ ctx.clearRect(0,0,400,600);
+
+ // player
+ ctx.fillStyle="cyan";
+ ctx.fillRect(player.x,player.y,player.w,player.h);
+
+ // bullets
+ ctx.fillStyle="yellow";
+ bullets.forEach(b=>{
+  b.y-=8;
+  ctx.fillRect(b.x,b.y,5,15);
+ });
+
+ // aliens
+ ctx.fillStyle="lime";
+ aliens.forEach(a=>{
+  a.y+=2;
+  ctx.fillRect(a.x,a.y,a.size,a.size);
+
+  bullets.forEach((b,i)=>{
+   if(b.x>a.x && b.x<a.x+a.size &&
+      b.y>a.y && b.y<a.y+a.size){
+      aliens.splice(aliens.indexOf(a),1);
+      bullets.splice(i,1);
+      score++;
+   }
+  });
+ });
+
+ ctx.fillStyle="white";
+ ctx.font="20px Arial";
+ ctx.fillText("Score: "+score,10,30);
+
+ requestAnimationFrame(update);
+}
+
+update();
+</script>
+</body>
+</html>
